@@ -1,0 +1,52 @@
+FROM apache/airflow:latest
+
+# WORKDIR /opt/airflow 
+COPY /entrypoint.sh .
+
+ENV AIRFLOW_HOME = ${AIRFLOW_HOME}
+# ENV JAR_HOME = /opt/jars 
+
+USER root
+
+RUN mkdir /opt/jars
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+         openjdk-11-jre-headless \
+  && apt-get autoremove -yqq --purge \
+  && apt-get clean \
+  && apt-get install wget \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/jars
+
+RUN wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.30/mysql-connector-java-8.0.30.jar
+
+WORKDIR /opt/airflow
+
+RUN chmod +x entrypoint.sh
+USER airflow
+
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+RUN export JAVA_HOME
+
+
+RUN pip install pymongo && \
+    pip install pymysql && \
+    pip install a-world-of-countries && \
+    pip install apache-airflow-providers-apache-spark && \
+    pip install pyspark
+
+# Install JDK 8
+
+# Set JAVA_HOME environment variable
+# ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+EXPOSE 8080
+
+# COPY ./dockerfiles/entrypoint.sh ./entrypoint.sh
+
+    
+ENTRYPOINT [ "./entrypoint.sh" ]
+
+
