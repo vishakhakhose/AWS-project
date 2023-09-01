@@ -14,8 +14,7 @@ default_args = {
     'email': ['test@test.com'],
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 0,
-    'retry_delay': timedelta(minutes=1)
+    'retries': 0
 }
 
 with  DAG("final_dag_processing", 
